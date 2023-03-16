@@ -28,6 +28,7 @@ batch_size = 64
 train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
+
 for X, y in test_dataloader:
     print(f"Shape of X [N, C, H, W]: {X.shape}")
     print(f"Shape of y: {y.shape} {y.dtype}")
@@ -111,7 +112,7 @@ def test(dataloader, model, loss_fn):
 
 
 
-epochs = 50
+epochs = 5
 
 for t in range(epochs):
     print(f"Epoch {t+1}")
@@ -119,9 +120,115 @@ for t in range(epochs):
     test(test_dataloader, model, loss_fn)
 print("Done")
 
-
-torch.save(model.state_dict(), "model_adam.pth")
+torch.save(model.state_dict(), "./models/model_adam_{epochs}.pth")
 print("Saving model")
 
-img = None
-pred = model(img)
+
+## Passing an image through model, just to visualize its acc
+def predicting_image(X):
+    #Running predict on model
+    X = X.to(device)
+    pred = model(X)
+
+    #Getting highest prob output
+    pred = pred.argmax(1).type(torch.float).item()
+
+    return pred
+
+
+import numpy as np # linear algebra
+import struct
+from array import array
+from os.path  import join
+
+#
+# MNIST Data Loader Class
+#
+class MnistDataloader(object):
+    def __init__(self, training_images_filepath,training_labels_filepath, test_images_filepath, test_labels_filepath):
+        self.training_images_filepath = training_images_filepath
+        self.training_labels_filepath = training_labels_filepath
+        self.test_images_filepath = test_images_filepath
+        self.test_labels_filepath = test_labels_filepath
+    
+    def read_images_labels(self, images_filepath, labels_filepath):        
+        labels = []
+        with open(labels_filepath, 'rb') as file:
+            magic, size = struct.unpack(">II", file.read(8))
+            if magic != 2049:
+                raise ValueError('Magic number mismatch, expected 2049, got {}'.format(magic))
+            labels = array("B", file.read())        
+        
+        with open(images_filepath, 'rb') as file:
+            magic, size, rows, cols = struct.unpack(">IIII", file.read(16))
+            if magic != 2051:
+                raise ValueError('Magic number mismatch, expected 2051, got {}'.format(magic))
+            image_data = array("B", file.read())        
+        images = []
+        for i in range(size):
+            images.append([0] * rows * cols)
+        for i in range(size):
+            img = np.array(image_data[i * rows * cols:(i + 1) * rows * cols])
+            img = img.reshape(28, 28)
+            images[i][:] = img            
+        
+        return images, labels
+            
+    def load_data(self):
+        x_train, y_train = self.read_images_labels(self.training_images_filepath, self.training_labels_filepath)
+        x_test, y_test = self.read_images_labels(self.test_images_filepath, self.test_labels_filepath)
+        return (x_train, y_train),(x_test, y_test)   
+    
+
+import matplotlib.pyplot as plt
+
+## Set file paths based on added MNIST Datasets
+
+input_path = './data/MNIST/raw'
+training_images_filepath = join(input_path, 'train-images-idx3-ubyte')
+training_labels_filepath = join(input_path, 'train-labels-idx1-ubyte')
+test_images_filepath = join(input_path, 't10k-images-idx3-ubyte')
+test_labels_filepath = join(input_path, 't10k-labels-idx1-ubyte')
+
+
+# Helper function to show a list of images with their relating titles
+
+def show_images(images, title_texts):
+    cols = 5
+    rows = int(len(images)/cols) + 1
+    plt.figure(figsize=(15,15))
+    index = 1    
+    for x in zip(images, title_texts):        
+        image = x[0]
+        title_text = x[1]
+        plt.subplot(rows, cols, index)        
+        plt.imshow(image, cmap=plt.cm.gray)
+        if (title_text != ''):
+            plt.title(title_text, fontsize = 7);     
+        plt.axis('off')   
+        index += 1
+    plt.show()
+
+#
+# Load MINST dataset
+#
+mnist_dataloader = MnistDataloader(training_images_filepath, training_labels_filepath, test_images_filepath, test_labels_filepath)
+(x_train, y_train), (x_test, y_test) = mnist_dataloader.load_data()
+
+#
+# Show some random training and test images 
+#
+images_2_show = []
+titles_2_show = []  
+
+for i in range(0, 2000):
+    image, label = test_data[i]
+
+    pred = predicting_image(image)
+
+    if int(pred) != y_test[i]:
+        images_2_show.append(x_test[i])        
+        titles_2_show.append(f'test = {str(y_test[i])} | prediction: {pred}')  
+
+show_images(images_2_show, titles_2_show)
+
