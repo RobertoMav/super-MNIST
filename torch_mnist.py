@@ -26,14 +26,13 @@ class NeuralNetwork(nn.Module):
             super().__init__() #Explain
             self.flatten = nn.Flatten()
             #creating NN structure
+            #TODO Alter structure
             self.linear_relu_stack = nn.Sequential(
                 nn.Linear(28*28, 512),
                 nn.ReLU(),
                 nn.Linear(512, 216),
                 nn.ReLU(),
-                nn.Linear(216, 10),
-                nn.Softmax(dim=1)
-                #### TODO: What changes if I use a softmax activation function - considering the loss function
+                nn.Linear(216, 10)       
             )
 
         def forward(self, x):
@@ -41,6 +40,7 @@ class NeuralNetwork(nn.Module):
             logits = self.linear_relu_stack(y)
             return logits
 
+#TODO change
 batch_size = 64
 
 # Create data loaders.
@@ -48,8 +48,8 @@ train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
 
-
 ## LEARNING RATE 
+#TODO Alter
 learning_rate = 1e-3
 
 ## LOSS FUNCT
@@ -67,11 +67,11 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu" 
     print(f"using {device} device")
 
-        
     model = NeuralNetwork().to(device=device)
     print(model)
 
     ## OPTIMIZER - ADAM 4 the win
+    #TODO alter optm
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     ## TRAINING
@@ -117,19 +117,13 @@ def main():
         print(f"Accuracy: {100*correct}, avg loss {test_loss}")
 
 
-    epochs = 10
+    epochs = 15
 
     for t in range(epochs):
         print(f"Epoch {t+1}")
         train(train_dataloader, model, loss_fn, optimizer)
         test(test_dataloader, model, loss_fn)
     print("Done")
-
-    ##Saving model using not model.dict: 
-    #   want to save the structure of this class together with the model, in which case we can pass model 
-    #   (and not model.state_dict()) to the saving function
-    # torch.save(model.state_dict(), "./models/model_adam_state_dict.pth")
-    # print("Saving model")
 
     torch.save(model, "./models/model_adam_softmax.pth")
     print("Saving full model")

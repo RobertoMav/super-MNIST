@@ -18,7 +18,11 @@ model.eval()
 
 #Setting loss fnct
 def loss_fn(logits, y_true):
-
+    
+    softmax = nn.Sequential(
+        nn.Softmax(dim=1)
+    )
+    logits = softmax(logits)
     pred_of_truth = logits[0][y_true]
     loss = -math.log(pred_of_truth)
 
@@ -35,7 +39,7 @@ def predicting_image(X):
     pred = logits.argmax(1).type(torch.float).item()
 
     return logits, pred
-    
+
 #
 # MNIST Data Loader Class
 #
@@ -104,10 +108,8 @@ def show_images(images, title_texts):
 
 
 # Load MINST dataset
-
 mnist_dataloader = MnistDataloader(training_images_filepath, training_labels_filepath, test_images_filepath, test_labels_filepath)
 (x_train, y_train), (x_test, y_test) = mnist_dataloader.load_data()
-
 
 
 images_2_show = []
