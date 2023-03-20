@@ -1,2 +1,4 @@
 .DS_STORE
 *.DS_STORE
+data/.DS_STORE
+data/MNIST/.DS_STORE
