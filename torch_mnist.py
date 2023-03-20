@@ -26,7 +26,7 @@ class NeuralNetwork(nn.Module):
             super().__init__() #Explain
             self.flatten = nn.Flatten()
             #creating NN structure
-            #TODO Alter structure
+            #TODO: Alter structure
             self.linear_relu_stack = nn.Sequential(
                 nn.Linear(28*28, 512),
                 nn.ReLU(),
@@ -40,7 +40,7 @@ class NeuralNetwork(nn.Module):
             logits = self.linear_relu_stack(y)
             return logits
 
-#TODO change
+#TODO: change
 batch_size = 64
 
 # Create data loaders.
@@ -49,7 +49,7 @@ test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
 
 ## LEARNING RATE 
-#TODO Alter
+#TODO: Alter
 learning_rate = 1e-3
 
 ## LOSS FUNCT
@@ -71,7 +71,7 @@ def main():
     print(model)
 
     ## OPTIMIZER - ADAM 4 the win
-    #TODO alter optm
+    #TODO: alter optm
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     ## TRAINING
@@ -117,7 +117,7 @@ def main():
         print(f"Accuracy: {100*correct}, avg loss {test_loss}")
 
 
-    epochs = 15
+    epochs = 30
 
     for t in range(epochs):
         print(f"Epoch {t+1}")
@@ -125,7 +125,7 @@ def main():
         test(test_dataloader, model, loss_fn)
     print("Done")
 
-    torch.save(model, "./models/model_adam_softmax.pth")
+    torch.save(model, f"./models/model_adam_epochs:{epochs}.pth")
     print("Saving full model")
 
 

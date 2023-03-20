@@ -13,7 +13,7 @@ test_data = test_data
 
 device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu" 
 #model = NeuralNetwork().to(device=device)
-model = torch.load("./models/model_adam_softmax.pth")
+model = torch.load("./models/model_adam_epochs:30.pth")
 model.eval()
 
 #Setting loss fnct
@@ -141,6 +141,7 @@ error_num = len(wrong_preds)
 acc = 100 - error_num/10000*100
 print(f"Accuracy (%): {acc:2f}")
 print(f"# of wrong predicts: {error_num}")
+
 idx_loss = 25
 
 np_lossy = np.array(lossy)
