@@ -12,7 +12,7 @@ test_data = test_data
 
 
 device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu" 
-#model = NeuralNetwork().to(device=device)
+print(device)
 model = torch.load("./models/model_adam_epochs:30.pth")
 model.eval()
 
