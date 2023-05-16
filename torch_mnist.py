@@ -21,6 +21,13 @@ test_data = datasets.MNIST(
     transform=ToTensor(),
 )
 
+#TODO: change
+batch_size = 64
+
+# Create data loaders.
+train_dataloader = DataLoader(training_data, batch_size=batch_size)
+test_dataloader = DataLoader(test_data, batch_size=batch_size)
+
 class NeuralNetwork(nn.Module):
         def __init__(self):
             super().__init__() #Explain
@@ -39,13 +46,6 @@ class NeuralNetwork(nn.Module):
             y = self.flatten(x)
             logits = self.linear_relu_stack(y)
             return logits
-
-#TODO: change
-batch_size = 64
-
-# Create data loaders.
-train_dataloader = DataLoader(training_data, batch_size=batch_size)
-test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
 
 ## LEARNING RATE 
